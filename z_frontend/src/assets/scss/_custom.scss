@@ -1,0 +1,19 @@
+// Here you can add other styles
+
+.card-nodec {
+    text-decoration: none;
+    color: black;
+}
+
+.card-nodec:hover {
+    text-decoration: none;
+    color: black;
+}
+
+.cardhover:hover {
+    transform: scale(1.02);
+}
+
+.cardhover {
+    transition: ease .3s;
+}

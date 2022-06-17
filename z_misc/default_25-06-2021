@@ -1,0 +1,59 @@
+server {
+	listen 80;
+	server_name vetplus.kz;
+	return 301 https://vetplus.kz$request_uri;
+}
+
+server {
+   listen 443 ssl;
+   ssl on;
+   ssl_certificate /etc/letsencrypt/live/vetplus.kz-0001/fullchain.pem;
+   ssl_certificate_key /etc/letsencrypt/live/vetplus.kz-0001/privkey.pem;
+   server_name vetplus.kz;
+   client_max_body_size 100M;
+
+   gzip on;
+   gzip_vary on;
+   gzip_proxied any;
+   gzip_http_version 1.1;
+   gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
+
+
+   access_log /home/john/logs/nginx-access.log;
+   error_log /home/john/logs/nginx-error.log;
+
+   root /home/john/frontend/;
+
+   location /static { # Serve the statics of backend
+      alias /home/john/static;
+   }
+
+    location /media { # Serve the media of backend
+        alias /home/john/static/images;
+    }
+   location / { # Catch all but defined routes to serve the frontend
+                try_files $uri $uri/ /index.html;
+   }
+
+   location ^~ /api/ { # Define routes to be directed to backend as proxy
+      include proxy_params;
+      proxy_pass http://0.0.0.0:8000;
+   }
+
+	location ^~ /upload/ {
+		include proxy_params;
+		proxy_pass http://0.0.0.0:8000/upload/;
+	}
+
+
+        location ^~ /badboys {
+                include proxy_params;
+                proxy_pass http://0.0.0.0:8000;
+        }
+
+        location ^~ /sitemap.xml { # For example if you use django.contrib.sitemaps
+                include proxy_params;
+                proxy_pass http://0.0.0.0:8000;
+        }
+
+}
